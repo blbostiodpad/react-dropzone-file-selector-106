@@ -124,6 +124,17 @@ function fromDataTransferItem(item: DataTransferItem, entry?: FileSystemEntry | 
     if (typeof (item as any).getAsFileSystemHandle === 'function') {
         return (item as any).getAsFileSystemHandle()
             .then(async (h: any) => {
+                if (h === null) {
+                    // Handle null case
+                    return Promise.reject(`${item} is not a File`);
+                }
+                const file = await h.getFile();
+                file.handle = h;
+                return toFileWithPath(file);
+            });
+    }
+        return (item as any).getAsFileSystemHandle()
+            .then(async (h: any) => {
                 const file = await h.getFile();
                 file.handle = h;
                 return toFileWithPath(file);
